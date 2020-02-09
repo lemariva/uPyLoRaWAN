@@ -2,7 +2,6 @@
 ESP32 using MicroPython meets lora.
 
 # Setup
-* `LoRaPingPong.py`: sends ping-pong messages between the nodes (bidirectional communication)
 * `LoRaReceiver.py` and `LoraSender.py`: unidirectional communication between the nodes (Note: deploy the `LoRaReceiver.py` on one node and the `LoraSender.py` on another node)
 
 # Hardware
