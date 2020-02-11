@@ -1,4 +1,6 @@
 import utime
+import struct
+import urandom
 from sx127x import TTN, SX127x
 from machine import Pin, SPI
 from ttn_config import *
@@ -30,15 +32,18 @@ lora = SX127x(device_spi, pins=device_pins, ttn_config=ttn_config)
 frame_counter = 0
 while True:
     timestamp = utime.localtime()
-    time_str = '%4d%02d%02d%02d%02d%02d' %(timestamp[0], timestamp[1], timestamp[2], timestamp[4], timestamp[5], timestamp[6])
 
-    payload = '{"clock": %s}' % time_str
-    byte_payload = bytearray(payload)
+    time_value = '%02d%02d%02d' %(timestamp[4], timestamp[5], timestamp[6])
+    date_value = '%4d%02d%02d' %(timestamp[0], timestamp[1], timestamp[2])
+    temperature = urandom.randint(0,30)
+    
+    payload = struct.pack('@qqh', int(date_value), int(time_value), int(temperature))
 
     if __DEBUG__:
         print(payload)
+        print("%s %s: %s" % (date_value, time_value, temperature))
     
-    lora.send_data(data=byte_payload, data_length=len(byte_payload), frame_counter=frame_counter)
+    lora.send_data(data=payload, data_length=len(payload), frame_counter=frame_counter)
     
     frame_counter += 1
     utime.sleep_ms(10000)
