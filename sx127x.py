@@ -1,6 +1,6 @@
 import utime
 from machine import SPI, Pin
-from lora_encryption import AES
+from encryption_aes import AES
 import gc
 import urandom
 import ubinascii
@@ -20,7 +20,7 @@ REG_FIFO_ADDR_PTR = 0x0D
 
 REG_FIFO_TX_BASE_ADDR = 0x0E
 FifoRxBaseAddr = 0x00
-FifoTxBaseAddr = 0x80
+FifoTxBaseAddr = 0x00
 
 REG_FIFO_RX_BASE_ADDR = 0x0F
 FifoRxBaseAddr = 0x00
@@ -123,7 +123,8 @@ class SX127x:
 
     _default_parameters = {
                 'tx_power_level': 2, 
-                'signal_bandwidth': 'SF7BW125',    
+                'signal_bandwidth': 'SF7BW125',
+                'spreading_factor': 7,    
                 'coding_rate': 5, 
                 'sync_word': 0x34, 
                 'implicit_header': False,
@@ -235,8 +236,9 @@ class SX127x:
         self.set_coding_rate(self._parameters['coding_rate'])
         self.set_sync_word(self._parameters['sync_word'])
         self.enable_CRC(self._parameters['enable_CRC'])
-        self.invert_IQ(self._parameters["invert_IQ"])
+        #self.invert_IQ(self._parameters["invert_IQ"])
         self.set_preamble_length(self._parameters['preamble_length'])
+        self.set_spreading_factor(self._parameters['spreading_factor'])
         # set LowDataRateOptimize flag if symbol time > 16ms (default disable on reset)
         # self.write_register(REG_MODEM_CONFIG, self.read_register(REG_MODEM_CONFIG) & 0xF7)  # default disable on reset
         
@@ -257,8 +259,8 @@ class SX127x:
 
     def begin_packet(self, implicit_header_mode = False):
         self.standby()
-        #self.implicit_header_mode(implicit_header_mode)
-        self.write_register(REG_DIO_MAPPING_1, 0x40)
+        self.implicit_header_mode(implicit_header_mode)
+        #self.write_register(REG_DIO_MAPPING_1, 0x40)
         
         # Check for multi-channel configuration
         if self._channel is None:
@@ -269,20 +271,23 @@ class SX127x:
         self.write_register(REG_FIFO_ADDR_PTR, FifoTxBaseAddr)
         self.write_register(REG_PAYLOAD_LENGTH, 0)
 
-    def end_packet(self, timeout=2):
+    def end_packet(self, timeout=5):
         # put in TX mode
         self.write_register(REG_OP_MODE, MODE_LONG_RANGE_MODE | MODE_TX)
 
         start = utime.time()
         timed_out = False
+
         # wait for TX done, standby automatically on TX_DONE
         #self.read_register(REG_IRQ_FLAGS) & IRQ_TX_DONE_MASK == 0 and \
+        irq_value = self.read_register(REG_IRQ_FLAGS)
         while not timed_out and \
-              not self._irq.value:
+              irq_value & IRQ_TX_DONE_MASK == 0:
+            
             if utime.time() - start >= timeout:
                 timed_out = True
             else:
-                pass
+                irq_value = self.read_register(REG_IRQ_FLAGS)
 
         if timed_out:
             raise RuntimeError("Timeout during packet send")
@@ -304,7 +309,7 @@ class SX127x:
     def set_lock(self, lock = False):
         self._lock = lock
 
-    def send_data(self, data, data_length, frame_counter, timeout=2):
+    def send_data(self, data, data_length, frame_counter, timeout=5):
         # Data packet
         enc_data = bytearray(data_length)
         lora_pkt = bytearray(64)
@@ -386,7 +391,22 @@ class SX127x:
 
     def get_irq_flags(self):
         irq_flags = self.read_register(REG_IRQ_FLAGS)
+
+        if __DEBUG__:
+            irq_dict = dict(
+                rx_timeout     = irq_flags >> 7 & 0x01,
+                rx_done        = irq_flags >> 6 & 0x01,
+                crc_error      = irq_flags >> 5 & 0x01,
+                valid_header   = irq_flags >> 4 & 0x01,
+                tx_done        = irq_flags >> 3 & 0x01,
+                cad_done       = irq_flags >> 2 & 0x01,
+                fhss_change_ch = irq_flags >> 1 & 0x01,
+                cad_detected   = irq_flags >> 0 & 0x01,
+            )
+            print(irq_dict)
+
         self.write_register(REG_IRQ_FLAGS, irq_flags)
+        
         return irq_flags
 
     def packet_rssi(self):
@@ -437,7 +457,12 @@ class SX127x:
         self.write_register(REG_PREAMBLE_MSB,  (length >> 8) & 0xff)
         self.write_register(REG_PREAMBLE_LSB,  (length >> 0) & 0xff)
 
-
+    def set_spreading_factor(self, sf): 
+        sf = min(max(sf, 6), 12)
+        self.write_register(REG_DETECTION_OPTIMIZE, 0xc5 if sf == 6 else 0xc3)
+        self.write_register(REG_DETECTION_THRESHOLD, 0x0c if sf == 6 else 0x0a)
+        self.write_register(REG_FEI_LSB, (self.read_register(REG_FEI_LSB) & 0x0f) | ((sf << 4) & 0xf0))
+        
     def set_bandwidth(self, datarate):
         try:
             sf, bw, modemcfg = self._data_rates[datarate]
@@ -454,6 +479,7 @@ class SX127x:
 
     def invert_IQ(self, invert_IQ):
         self._parameters["invertIQ"] = invert_IQ
+
         if invert_IQ:
             self.write_register(
                 REG_INVERTIQ,
@@ -482,7 +508,7 @@ class SX127x:
                 ),
             )
             self.write_register(REG_INVERTIQ2, RFLR_INVERTIQ2_OFF)
-
+    
     def set_sync_word(self, sw):
         self.write_register(REG_SYNC_WORD, sw)
 
@@ -496,16 +522,18 @@ class SX127x:
 
     def implicit_header_mode(self, implicit_header_mode = False):
         self._implicit_header_mode = implicit_header_mode
+        
         modem_config_1 = self.read_register(REG_FEI_MSB)
         config = (modem_config_1 | 0x01 
                 if implicit_header_mode else modem_config_1 & 0xfe)
+
         self.write_register(REG_FEI_MSB, config)
 
     def receive(self, size = 0):
         self.implicit_header_mode(size > 0)
+
         if size > 0: 
             self.write_register(REG_PAYLOAD_LENGTH, size & 0xff)
-
         # The last packet always starts at FIFO_RX_CURRENT_ADDR
         # no need to reset FIFO_ADDR_PTR
         self.write_register(
@@ -517,6 +545,7 @@ class SX127x:
 
         if self._pin_rx_done:
             if callback:
+                print("callback attached")
                 self.write_register(REG_DIO_MAPPING_1, 0x00)
                 self._pin_rx_done.irq(
                     trigger=Pin.IRQ_RISING, handler = self.handle_on_receive
@@ -524,19 +553,53 @@ class SX127x:
             else:
                 self._pin_rx_done.detach_irq()
 
+
     def handle_on_receive(self, event_source):
         self.set_lock(True)              # lock until TX_Done
+
+        aes = AES(
+            self._ttn_config.device_address,
+            self._ttn_config.app_key,
+            self._ttn_config.network_key,
+            self.frame_counter
+        )
+
+        # irqFlags = self.getIrqFlags() should be 0x50
+        if (self.get_irq_flags() & IRQ_PAYLOAD_CRC_ERROR_MASK) == 0:
+            if self._on_receive:
+                payload = self.read_payload()
+                self.set_lock(False)     # unlock when done reading
+                data = aes.decrypt_payload(payload)
+                self._on_receive(self, data)
+
+        self.set_lock(False)             # unlock in any case.
+        self.collect_garbage()
+
+    """
+    def handle_on_receive(self, event_source):
+        self.set_lock(True)              # lock until TX_Done
+        
+        aes = AES(
+            self._ttn_config.device_address,
+            self._ttn_config.app_key,
+            self._ttn_config.network_key,
+            self.frame_counter
+        )
+
         irq_flags = self.get_irq_flags()
 
         if (irq_flags == IRQ_RX_DONE_MASK):  # RX_DONE only, irq_flags should be 0x40
             # automatically standby when RX_DONE
+            print("yeah" + str(irq_flags))
             if self._on_receive:
                 payload = self.read_payload()
-                self._on_receive(self, payload)
+                data = aes.decrypt_payload(payload)
+                self._on_receive(self, data)
 
         elif self.read_register(REG_OP_MODE) != (
             MODE_LONG_RANGE_MODE | MODE_RX_SINGLE
             ):
+            print("nada" + str(irq_flags))
             # no packet received.
             # reset FIFO address / # enter single RX mode
             self.write_register(REG_FIFO_ADDR_PTR, FifoRxBaseAddr)
@@ -548,7 +611,7 @@ class SX127x:
         self.set_lock(False)             # unlock in any case.
         self.collect_garbage()
         return True
-
+        """
     def received_packet(self, size = 0):
         irq_flags = self.get_irq_flags()
 
@@ -556,9 +619,9 @@ class SX127x:
         if size > 0: 
             self.write_register(REG_PAYLOAD_LENGTH, size & 0xff)
 
-        # if (irq_flags & IRQ_RX_DONE_MASK) and \
-           # (irq_flags & IRQ_RX_TIME_OUT_MASK == 0) and \
-           # (irq_flags & IRQ_PAYLOAD_CRC_ERROR_MASK == 0):
+        #if (irq_flags & IRQ_RX_DONE_MASK) and \
+        #    (irq_flags & IRQ_RX_TIME_OUT_MASK == 0) and \
+        #    (irq_flags & IRQ_PAYLOAD_CRC_ERROR_MASK == 0):
 
         if (irq_flags == IRQ_RX_DONE_MASK):  
             # RX_DONE only, irq_flags should be 0x40
@@ -602,7 +665,6 @@ class SX127x:
 
     def write_register(self, address, value):
         self.transfer(address | 0x80, value)
-
 
     def transfer(self, address, value = 0x00):
         response = bytearray(1)
