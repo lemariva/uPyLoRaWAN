@@ -11,6 +11,7 @@ Follow these steps to deploy the project:
 
 # Hardware
 * [Wemos® TTGO LORA32 868/915Mhz](https://www.banggood.com/2Pcs-Wemos-TTGO-LORA32-868915Mhz-ESP32-LoRa-OLED-0_96-Inch-Blue-Display-p-1239769.html?p=QW0903761303201409LG) board.
+* [M5Stack ATOM](https://www.banggood.com/custlink/KmGDkSGLhO) connected to [LoRa v2.0 board](https://s.click.aliexpress.com/e/_dU6udTr).
 
 # Revision
 * 0.2v - first commit with LoRaWAN support
