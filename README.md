@@ -5,6 +5,10 @@ Check out these articles for more information:
 * [M5Stack Atom Matrix: LoRaWAN node running MicroPython](https://lemariva.com/blog/2020/03/m5stack-atom-lorawan-node-running-micropython)
 * [Tutorial: ESP32 running MicroPython sends data over LoRaWAN](https://lemariva.com/blog/2020/02/tutorial-micropython-esp32-sends-data-over-lorawan)
 
+# Video
+
+[![M5Stack Atom Matrix running MicroPython meets LoRaWAN](https://img.youtube.com/vi/Nu60jVDbLW8/0.jpg)](https://www.youtube.com/watch?v=Nu60jVDbLW8)
+
 # Setup
 Use [VSCode and the PyMakr extension](https://lemariva.com/blog/2018/12/micropython-visual-studio-code-as-ide) to upload the code. If you are new on MicroPython, [this tutorial](https://lemariva.com/blog/2017/10/micropython-getting-started) can help you to install the firmware on a ESP32.
 
