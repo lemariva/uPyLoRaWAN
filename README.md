@@ -1,5 +1,9 @@
 # uPyLora
-ESP32 using MicroPython meets lora. This repo includes the sx127x micropython driver to communicate between two devices using LoRa. The repository is extended for LoRaWAN on the following repository: https://github.com/lemariva/uPyLoRaWAN/tree/LoRaWAN
+ESP32 using MicroPython meets lora. 
+
+This repo includes an sx127x micropython driver to communicate between two devices using LoRa. 
+
+For the LoRaWAN repository click on [here](https://github.com/lemariva/uPyLoRaWAN/tree/LoRaWAN).
 
 # Setup
 Check out these articles for more information:
