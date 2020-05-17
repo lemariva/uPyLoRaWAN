@@ -37,7 +37,7 @@ device_config = {
 }
 """
 
-#M5Stack & LoRA868 Module
+#M5Stack Fire & LoRA868 Module
 device_config = {
     'miso':19,
     'mosi':23,
