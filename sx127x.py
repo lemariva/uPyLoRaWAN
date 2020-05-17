@@ -144,14 +144,13 @@ class SX127x:
                  spi,
                  pins,
                  ttn_config, 
-                 channel=0, # compatibility with Dragino LG02
+                 channel=0,  # compatibility with Dragino LG02, set to None otherwise
                  fport=1,
                  lora_parameters=_default_parameters):
         
         self._spi = spi
         self._pins = pins
         self._parameters = lora_parameters
-        
         self._lock = False
 
         # setting pins
@@ -163,14 +162,13 @@ class SX127x:
         if "led" in self._pins:
             self._led_status = Pin(self._pins["led"], Pin.OUT)
 
-
         # check hardware version
         init_try = True
         re_try = 0
         while init_try and re_try < 5:
             version = self.read_register(REG_VERSION)
             re_try = re_try + 1
-
+            
             if __DEBUG__:
                 print("SX version: {}".format(version))
 
@@ -178,7 +176,6 @@ class SX127x:
                 init_try = False
             else:
                 utime.sleep_ms(1000)
-
 
         if version != 0x12:
             raise Exception('Invalid version.')

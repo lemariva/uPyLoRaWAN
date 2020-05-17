@@ -1,10 +1,8 @@
 # boot.py
+import config
 import network
 import utime
 import ntptime
-# wlan access
-ssid_ = ''
-wp2_pass = ''
 
 ## ftp access
 #from ftp import ftpserver
@@ -17,10 +15,10 @@ def do_connect():
     if not sta_if.isconnected():
         print('connecting to network...')
         sta_if.active(True)
-        sta_if.connect(ssid_, wp2_pass)
+        sta_if.connect(config.wifi_config["ssid"], config.wifi_config["password"])
         while not sta_if.isconnected() and \
             not timed_out:        
-            if utime.time() - start >= 10:
+            if utime.time() - start >= 20:
                 timed_out = True
             else:
                 pass

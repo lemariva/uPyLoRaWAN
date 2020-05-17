@@ -109,5 +109,4 @@ old/
 
 
 # config files
-ttn_config.py
-boot.py
+config.py
