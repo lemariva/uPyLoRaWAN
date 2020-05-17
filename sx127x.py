@@ -79,17 +79,17 @@ __DEBUG__ = True
 class SX127x:
 
     default_parameters = {
-                'frequency': 868E6, 
-                'tx_power_level': 2, 
-                'signal_bandwidth': 125E3,    
-                'spreading_factor': 8, 
-                'coding_rate': 5, 
-                'preamble_length': 8,
-                'implicit_header': False, 
-                'sync_word': 0x12, 
-                'enable_CRC': False,
-                'invert_IQ': False,
-                }
+            'frequency': 868E6, 
+            'tx_power_level': 2, 
+            'signal_bandwidth': 125E3,    
+            'spreading_factor': 8, 
+            'coding_rate': 5, 
+            'preamble_length': 8,
+            'implicit_header': False, 
+            'sync_word': 0x12, 
+            'enable_CRC': False,
+            'invert_IQ': False,
+            }
 
     frfs = {169E6: (42, 64, 0),
             433E6: (108, 64, 0),

@@ -106,3 +106,4 @@ venv.bak/
 
 # old files
 old/
+config.py
