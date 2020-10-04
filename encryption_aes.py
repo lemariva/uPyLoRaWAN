@@ -178,7 +178,8 @@ class AES:
     def _mic_generate_keys(self, key_1, key_2):
         # encrypt the 0's in k1 with network key
         _aes = aes(self._network_key, 1)
-        key_1 = bytearray(_aes.encrypt(key_1))
+        _key = bytearray(_aes.encrypt(key_1))
+        key_1[0:16] = _key[0:16]
         # perform gen_key on key_1
         # check if key_1's msb is 1
         msb_key = (key_1[0] & 0x80) == 0x80
