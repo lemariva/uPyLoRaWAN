@@ -91,13 +91,6 @@ class SX127x:
             'invert_IQ': False,
             }
 
-    frfs = {169E6: (42, 64, 0),
-            433E6: (108, 64, 0),
-            434E6: (108, 128, 0),
-            866E6: (216, 128, 0),
-            868E6: (217, 0, 0),
-            915E6: (228, 192, 0)}
-            
     def __init__(self,
                  spi,
                  pins,
@@ -256,12 +249,14 @@ class SX127x:
             level = min(max(level, 2), 17)
             self.write_register(REG_PA_CONFIG, PA_BOOST | (level - 2))
 
-    def set_frequency(self, frequency, freq_table=frfs):
+    def set_frequency(self, frequency):
         self._frequency = frequency
 
-        self.write_register(REG_FRF_MSB, freq_table[frequency][0])
-        self.write_register(REG_FRF_MID, freq_table[frequency][1])
-        self.write_register(REG_FRF_LSB, freq_table[frequency][2])
+        freq_reg = int(int(int(frequency) << 19) / 32000000) & 0xFFFFFF
+
+        self.write_register(REG_FRF_MSB, (freq_reg & 0xFF0000) >> 16)
+        self.write_register(REG_FRF_MID, (freq_reg & 0xFF00) >> 8)
+        self.write_register(REG_FRF_LSB, (freq_reg & 0xFF))
 
     def set_spreading_factor(self, sf):
         sf = min(max(sf, 6), 12)
