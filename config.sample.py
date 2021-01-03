@@ -25,6 +25,17 @@ device_config = {
     'led':2, 
 }
 
+# SparkFun WRL-15006 ESP32 LoRa Gateway
+device_config = {
+    'miso':12,
+    'mosi':13,
+    'ss':16,
+    'sck':14,
+    'dio_0':26,
+    'reset':36,
+    'led':17, 
+}
+
 # M5Stack ATOM Matrix
 device_config = {
     'miso':23,

@@ -23,6 +23,7 @@ Follow these steps to deploy the project:
 
 # Hardware
 * [Wemos® TTGO LORA32 868/915Mhz](https://www.banggood.com/2Pcs-Wemos-TTGO-LORA32-868915Mhz-ESP32-LoRa-OLED-0_96-Inch-Blue-Display-p-1239769.html?p=QW0903761303201409LG) board.
+* [SparkFun® LoRa Gateway - 1-Channel](https://www.sparkfun.com/products/15006) board.
 * [M5Stack ATOM](https://www.banggood.com/custlink/KmGDkSGLhO) connected to [LoRa v2.0 board](https://s.click.aliexpress.com/e/_dU6udTr).
 [M5Stack Fire](https://www.banggood.com/custlink/DvKKuhvU9J) connected to the [LoRa868 Module](https://www.banggood.com/custlink/DGvGud3zSI).
 
