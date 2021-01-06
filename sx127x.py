@@ -414,6 +414,10 @@ class SX127x:
         return True
 
     def received_packet(self, size = 0):
+        # Don't check Rx until Tx is done
+        if self._lock:
+            return not self._lock
+
         irq_flags = self.get_irq_flags()
 
         self.implicit_header_mode(size > 0)
