@@ -161,6 +161,14 @@ class SX127x:
             self._pin_ss = Pin(self._pins["ss"], Pin.OUT)
         if "led" in self._pins:
             self._led_status = Pin(self._pins["led"], Pin.OUT)
+        if "reset" in self._pins:
+            self._reset = Pin(self._pins["reset"], Pin.OUT)
+
+
+        self._reset.value(False)
+        utime.sleep(1)
+        self._reset.value(True)
+        utime.sleep(1)
 
         # check hardware version
         init_try = True
