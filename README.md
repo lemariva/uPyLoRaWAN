@@ -1,9 +1,12 @@
 # uPyLoraWAN
-The ESP32 and M5Stack using MicroPython meet LoRaWAN.
+The ESP32, Raspberry PI Pico, and M5Stack using MicroPython meet LoRaWAN.
 
 Check out these articles for more information:
 * [M5Stack Atom Matrix: LoRaWAN node running MicroPython](https://lemariva.com/blog/2020/03/m5stack-atom-lorawan-node-running-micropython)
 * [Tutorial: ESP32 running MicroPython sends data over LoRaWAN](https://lemariva.com/blog/2020/02/tutorial-micropython-esp32-sends-data-over-lorawan)
+* [Raspberry Pi Pico: The RP2040 meets LoRaWAN](https://lemariva.com/blog/2021/02/raspberry-pi-pico-rp2040-meets-lorawan)
+
+:warning: Nowadays (20210215) you need to extend the MicroPython version to include support for encryption. To do that, check out [this tutorial](https://lemariva.com/blog/2021/02/raspberry-pi-pico-rp2040-meets-lorawan), and this repository [lemariva/micropython-pico-mbedtls](https://github.com/lemariva/micropython-pico-mbedtls).
 
 # Video
 
@@ -19,6 +22,7 @@ Follow these steps to deploy the project:
     * [ES32 TTGO v1.0](https://www.banggood.com/custlink/v3KmwRD2tf)
     * [M5Stack ATOM](https://www.banggood.com/custlink/KK331YvU8K) connected to [LoRa v2.0 board](https://s.click.aliexpress.com/e/_dU6udTr).
     * [M5Stack Fire](https://www.banggood.com/custlink/DvKKuhvU9J) connected to the [LoRa868 Module](https://www.banggood.com/custlink/DGvGud3zSI).
+    * [Raspberry Pi Pico](https://www.raspberrypi.org/products/raspberry-pi-pico/) connected to [LoRa v2.0 board](https://s.click.aliexpress.com/e/_dU6udTr).
 3. Configure the `devaddr`, `nwkey`, and `app` of the `ttn_config` variable following the instruction from [this link](https://lemariva.com/blog/2020/03/m5stack-atom-lorawan-node-running-micropython).
 
 # Hardware

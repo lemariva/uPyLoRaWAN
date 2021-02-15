@@ -1,4 +1,4 @@
-# Copyright 2020 LeMaRiva|tech lemariva.com
+# Copyright 2021 LeMaRiva|tech lemariva.com
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 """
 # ES32 TTGO v1.0 
 device_config = {
+    'spi_unit': 1,
     'miso':19,
     'mosi':27,
     'ss':18,
@@ -27,6 +28,7 @@ device_config = {
 
 # SparkFun WRL-15006 ESP32 LoRa Gateway
 device_config = {
+    'spi_unit': 1,
     'miso':12,
     'mosi':13,
     'ss':16,
@@ -35,9 +37,9 @@ device_config = {
     'reset':36,
     'led':17, 
 }
-
 # M5Stack ATOM Matrix
 device_config = {
+    'spi_unit': 1,
     'miso':23,
     'mosi':19,
     'ss':22,
@@ -46,10 +48,10 @@ device_config = {
     'reset':21,
     'led':12, 
 }
-"""
 
-#M5Stack Fire & LoRA868 Module
+#M5Stack & LoRA868 Module
 device_config = {
+    'spi_unit': 1,
     'miso':19,
     'mosi':23,
     'ss':5,
@@ -57,6 +59,32 @@ device_config = {
     'dio_0':26,
     'reset':36,
     'led':12, 
+}
+
+# RASPBERRY PI Pico 
+device_config = {
+    'spi_unit': 0,
+    'miso':4,
+    'mosi':3,
+    'ss':5,
+    'sck':2,
+    'dio_0':6,
+    'reset':7,
+    'led':25, 
+}
+
+"""
+
+# ES32 TTGO v1.0 
+device_config = {
+    'spi_unit': 1,
+    'miso':19,
+    'mosi':27,
+    'ss':18,
+    'sck':5,
+    'dio_0':26,
+    'reset':14,
+    'led':2, 
 }
 
 app_config = {
@@ -72,7 +100,7 @@ lora_parameters = {
     'sync_word': 0x34, 
     'implicit_header': False,
     'preamble_length': 8,
-    'enable_CRC': False,
+    'enable_CRC': True,
     'invert_IQ': False,
 }
 
