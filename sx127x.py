@@ -201,21 +201,22 @@ class SX127x:
 
     def set_lock(self, lock = False):
         self._lock = lock
-
-    def println(self, msg, implicit_header = False):
+    
+    def send_bytes(self, buff, implicit_header = False):
         self.set_lock(True)  # wait until RX_Done, lock and begin writing.
-
         self.begin_packet(implicit_header)
-
-        if isinstance(msg, str):
-            message = msg.encode()
-            
-        self.write(message)
-
+        self.write(buff)
         self.end_packet()
-
         self.set_lock(False) # unlock when done writing
         self.collect_garbage()
+
+    def println(self, msg, implicit_header = False):
+        if isinstance(msg, str):
+            self.send_bytes(msg.encode(), implicit_header)
+        elif isinstance(msg, bytes):
+            self.send_bytes(msg, implicit_header)
+        else:
+            self.send_bytes(bytes(msg), implicit_header)
 
     def get_irq_flags(self):
         irq_flags = self.read_register(REG_IRQ_FLAGS)
